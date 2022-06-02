@@ -29,11 +29,24 @@ def create_app():
 
     @app.route("/", methods=["GET"])
     def get_main_page():
-        date, close, seasonality = get_quotes_from_db()
-        return render_template('index.html',
-                               dt=json.dumps(date),
-                               close=close,
-                               seasonality=seasonality)
+        from models import db, get_quotes_from_csv, \
+            load_quotes_to_db, get_quotes_with_seasonality, get_quotes_from_db
+
+        file_path = os.path.join(data_folder, file_name)
+        quotes = get_quotes_from_csv(file_path=file_path)
+        quotes_with_seasonality = get_quotes_with_seasonality(quotes=quotes)
+        load_quotes_to_db(quotes=quotes_with_seasonality)
+
+
+        quotes = get_quotes_from_db()
+        return render_template('index.html', quotes=quotes)
+
+        # date, close, seasonality = get_quotes_from_db()
+
+        # return render_template('index.html',
+        #                        dt=json.dumps(date),
+        #                        close=close,
+        #                        seasonality=seasonality)
 
     return app
 
@@ -42,9 +55,9 @@ if __name__ == '__main__':
     app = create_app()
     app.run()
 
-    from models import db, get_quotes_from_csv,\
-        load_quotes_to_db, get_quotes_with_seasonality, get_quotes_from_db
-
+    # from models import db, get_quotes_from_csv,\
+    #     load_quotes_to_db, get_quotes_with_seasonality, get_quotes_from_db
+    #
     # file_path = os.path.join(data_folder, file_name)
     # quotes = get_quotes_from_csv(file_path=file_path)
     # quotes_with_seasonality = get_quotes_with_seasonality(quotes=quotes)

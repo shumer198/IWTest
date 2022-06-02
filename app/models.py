@@ -3,7 +3,7 @@ from typing import Any, Dict
 import pandas as pd
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import delete
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from scipy import signal
 
 
@@ -95,16 +95,8 @@ def get_quotes_with_seasonality(quotes):
 def get_quotes_from_db(market='KC-057'):
     quotes = db.session.query(Quote.date, Quote.close, Quote.seasonality).\
         filter(Quote.market == market).all()
-    date = list()
-    close = list()
-    seasonality = list()
-    i = 0
-    for quote in quotes:
-        date.append(str(quote.date))
-        close.append(quote.close)
-        seasonality.append(quote.seasonality * 10)
-        i += 1
-        if i == 300:
-            break
+    quotes_for_send = [[i, quote.close, quote.seasonality*5]
+                       for i, quote in enumerate(quotes)]
+    quotes_for_send.insert(0, ['Date', 'Close', 'Seasonality'])
 
-    return date, close, seasonality
+    return quotes_for_send

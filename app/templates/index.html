@@ -62,42 +62,83 @@
 <!--   </body>-->
 <!--</html>-->
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>IW Test case</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.7"></script>
-</head>
-<body>
-    <canvas id="myChart" style="width:200%;max-width:1200px"></canvas>
-    <script>
-        var xValues = {{dt|safe}};
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <title>IW Test case</title>#}
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>#}
+{#    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3"></script>#}
+{#    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>#}
+{#    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.7"></script>#}
+{#</head>#}
+{#<body>#}
+{#    <canvas id="myChart" style="width:200%;max-width:1200px"></canvas>#}
+{#    <script>#}
+{#        var xValues = {{dt|safe}};#}
+{##}
+{#        new Chart("myChart", {#}
+{#          type: "line",#}
+{#          data: {#}
+{#            labels: xValues,#}
+{#            datasets: [{#}
+{#              data: {{close}},#}
+{#              borderColor: "red",#}
+{#              pointRadius: 0,#}
+{#              fill: false#}
+{#            },#}
+{#        {#}
+{#              data: {{seasonality}},#}
+{#              borderColor: "blue",#}
+{#              pointRadius: 0,#}
+{#              fill: false#}
+{#            }]#}
+{#          },#}
+{#          options: {#}
+{#            legend: {display: false}#}
+{#          }#}
+{#        });#}
+{#    </script>#}
+{#</body>#}
+{#</html>#}
 
-        new Chart("myChart", {
-          type: "line",
-          data: {
-            labels: xValues,
-            datasets: [{
-              data: {{close}},
-              borderColor: "red",
-              pointRadius: 0,
-              fill: false
-            },
-        {
-              data: {{seasonality}},
-              borderColor: "blue",
-              pointRadius: 0,
-              fill: false
-            }]
-          },
-          options: {
-            legend: {display: false}
-          }
-        });
+
+  <html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        {#var data = google.visualization.arrayToDataTable([#}
+        {#  ['Year', 'Sales', 'Expenses'],#}
+        {#  ['2004',  1000,      400],#}
+        {#  ['2005',  1170,      460],#}
+        {#  ['2006',  660,       1120],#}
+        {#  ['2007',  1030,      540]#}
+        {#]);#}
+
+        var data = google.visualization.arrayToDataTable( {{ quotes|safe }});
+
+        var options = {
+          title: 'Price and seasonality',
+          curveType: 'function',
+          legend: { position: 'bottom' },
+            explorer: {
+                axis:"horizontal",
+                     maxZoomOut:2,
+                     keepInBounds: true
+            }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+      }
     </script>
-</body>
+  </head>
+  <body>
+    <div id="curve_chart" style="width: 1200px; height: 700px"></div>
+  </body>
 </html>
