@@ -1,0 +1,26 @@
+# Выкачиваем из dockerhub образ с python версии 3.9
+FROM python:3.7.9-slim-stretch
+# Устанавливаем рабочую директорию для проекта в контейнере
+WORKDIR /app
+# Скачиваем/обновляем необходимые библиотеки для проекта
+COPY /app/requirements.txt /app
+RUN pip3 install --upgrade pip -r requirements.txt
+
+# Устанавливаем supervisor и nginx
+RUN apt-get update && apt-get install -y supervisor nginx
+RUN pip install psycopg2-binary
+
+# Удаляем default config nginx
+RUN rm /etc/nginx/sites-enabled/default
+
+# Заливаем конфиги gunicorn nginx и supervisord
+COPY /deploy/gunicorn.conf.py /app
+COPY /deploy/supervisord.conf /etc/supervisor/
+COPY /deploy/nginx.conf /etc/nginx/sites-enabled
+
+COPY /app/main.py /app
+COPY /app/api_requests.py /app
+ADD /app/models /app/models
+
+# Устанавливаем порт, который будет использоваться для сервера
+EXPOSE 80
